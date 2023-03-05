@@ -8,6 +8,7 @@ import glob
 import time
 import chess
 
+#test zmiana komend gita
 
 pp = 1
 
