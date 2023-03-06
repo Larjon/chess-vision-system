@@ -6,9 +6,11 @@ from cairosvg import svg2png
 import numpy as np
 import glob
 import time
-import chess
+import chess.engine
+import pygame
+import io
 
-#test zmiana komend gita
+
 
 pp = 1
 
@@ -140,7 +142,7 @@ def change_size(ww):
    #Ustawienie kamery i dopasowanie jej krawedzi
     img = cv2.imread(f'snapshot_{ww}.jpg')
     #zmiana wspolrzednych od lewego gornego rogu
-    input_points = np.float32([[124,36],[524,26],[110,436],[541,441]])
+    input_points = np.float32([[125,34],[561,33],[129,453],[550,460]])
     width = 600
     height = 600
     converated_points = np.float32([[0,0],[width,0],[0,height],[width,height]])
@@ -226,7 +228,7 @@ print ("Hello szachy")
 capture = cv2.VideoCapture(0)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
-print('Nacisnij dowolny klawisz')
+print('Czekaj..')
 cv2.waitKey(0)
 time.sleep(2)
 _, frame = capture.read()
@@ -240,17 +242,60 @@ path = (f'snapshot_{pp}.jpg')
 cv2.imwrite(path, frame)
 print('Zapisano poczatkowe zdjęcie parti')
 img = cv2.imread(path)
-cv2.imshow("oryginal", img)
-cv2.waitKey(0)
+# cv2.imshow("oryginal", img)
+# cv2.waitKey(0)
 
 change_size(pp)
 disortion(path,pp)
      
+
+
+
+def wyswietlanie():
+    # Wczytanie obrazu szachownicy SVG i konwersja na format PNG
+    board_svg = chess.svg.board(board)
+    board_png = svg2png(board_svg)
+
+    # Konwersja obrazu PNG na obiekt Pygame
+    board_surface = pygame.image.load(io.BytesIO(board_png))
+
+    # Ustawienie pozycji szachownicy na ekranie
+    board_rect = board_surface.get_rect(center=screen.get_rect().center)
+
+    screen.blit(board_surface, board_rect)
+
+    # Odświeżenie ekranu
+    pygame.display.flip()
+
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+
+# Utworzenie obiektu silnika szachowego Stockfish
+engine = chess.engine.SimpleEngine.popen_uci("stockfish-windows-2022-x86-64-avx2.exe")
+
+# Utworzenie obiektu szachownicy
 board = chess.Board()
+
+
+pygame.init()
+
+# Ustawienie wymiarów okna
+WINDOW_SIZE = (400, 400)
+screen = pygame.display.set_mode(WINDOW_SIZE)
+wyswietlanie()
+
+
+
+
+
 oo = 1
 while True:
     
-    cv2.imshow("oryginal", img)
+    cv2.imshow("oryginal", frame)
     if pp == oo:
         print("Nacisnij s jeśli zrobiłeś ruch")
         oo = oo + 1
@@ -290,8 +335,8 @@ while True:
             diff_gray = cv2.cvtColor(diff,cv2.COLOR_BGR2GRAY)
             # cv2.imshow("diff_gray", diff_gray)
             cv2.imwrite("Difference_GrayScale_image.jpg",diff_gray)
-            print('Czekam na dowolny klawisz!')
-            cv2.waitKey(0)
+            # print('Czekam na dowolny klawisz!')
+            # cv2.waitKey(0)
 
 
 
@@ -312,15 +357,17 @@ while True:
             # polozenie(sciezka)
             posuniecie = znajdowanie_pola()
             
-            print(board)     
             licznik = 0
             while not board.is_game_over():
                 fen = board.fen()
-
+                wyswietlanie()
                 print(fen)
+                print(board)
                 print("przed petla moje posuniecie to =",posuniecie)
                 try:
                     board.push_san(posuniecie)
+                    wyswietlanie()
+                    print(board)
                     break
                 except ValueError:
                     print("Invalid move, try again.")
@@ -328,11 +375,20 @@ while True:
                     print("(po wprowadzeniu bledu) moje posuniecie to =",posuniecie)
                     if licznik == 2:
                         print("coś poszlo nie tak")
-                        break
+                        
                     licznik = licznik + 1
                     continue
+
+            wyswietlanie()
+            time.sleep(2)
+            # Ruch silnika szachowego
+            result = engine.play(board, chess.engine.Limit(time=2.0))
+            engine_move = result.move
+            board.push(engine_move)
+            print(board)
+            wyswietlanie()
             
-            print(board)     
+               
 
             
 
