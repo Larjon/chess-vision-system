@@ -1,4 +1,4 @@
-# chess-vision-system
+# Chess-vision-system
 
 Using camera Open CV, python and chess engine stockfish to make best move in position.
 
