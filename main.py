@@ -11,9 +11,6 @@ import pygame
 import io
 
 
-
-pp = 1
-
 def nothing(X):
     pass
 
@@ -77,8 +74,6 @@ def disortion(path, nr):
     # cv2.waitKey(0)
 
 
-
-
 def polozenie(path):
     # Wczytanie obrazu
     img = cv2.imread(path)
@@ -136,8 +131,6 @@ def polozenie(path):
     cv2.waitKey(0)
 
 
-
-
 def change_size(ww):
    #Ustawienie kamery i dopasowanie jej krawedzi
     img = cv2.imread(f'snapshot_{ww}.jpg')
@@ -153,8 +146,7 @@ def change_size(ww):
     # cv2.imshow("Nowe perspektywa", img_output)
     # print("zmiana wielkosci obrazu wcisnij dowolny klawisz")
     # cv2.waitKey(0)
-
-
+pp = 1
 
 def znajdowanie_pola():
     # Wczytanie obrazu o wymiarach 600x600
@@ -224,7 +216,6 @@ def convert_to_chess_notation(x, y):
 
 
 print ("Hello szachy")
-
 capture = cv2.VideoCapture(0)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
@@ -249,8 +240,6 @@ change_size(pp)
 disortion(path,pp)
      
 
-
-
 def wyswietlanie():
     # Wczytanie obrazu szachownicy SVG i konwersja na format PNG
     board_svg = chess.svg.board(board)
@@ -266,8 +255,7 @@ def wyswietlanie():
 
     # Odświeżenie ekranu
     pygame.display.flip()
-
-    
+ 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -280,17 +268,12 @@ engine = chess.engine.SimpleEngine.popen_uci("stockfish-windows-2022-x86-64-avx2
 # Utworzenie obiektu szachownicy
 board = chess.Board()
 
-
 pygame.init()
 
 # Ustawienie wymiarów okna
 WINDOW_SIZE = (400, 400)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 wyswietlanie()
-
-
-
-
 
 oo = 1
 while True:
@@ -303,7 +286,6 @@ while True:
     _, frame = capture.read()
     grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # print('Pętla sie wykonuje!')
-
 
     key = cv2.waitKey(1)
     if key == ord('s'):
@@ -318,27 +300,20 @@ while True:
             image1 = cv2.imread(f'snapshot_{pp}.jpg')
             image1_gray = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
 
-
-
             pp = pp + 1
             image2 = cv2.imread(f'snapshot_{pp}.jpg')
             image2_gray = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-
 
             diff = cv2.absdiff(image1,image2)
             diff = cv2.resize(diff,(800,800))
             # cv2.imshow("diff", img)
             # cv2.waitKey(0)
 
-
-
             diff_gray = cv2.cvtColor(diff,cv2.COLOR_BGR2GRAY)
             # cv2.imshow("diff_gray", diff_gray)
             cv2.imwrite("Difference_GrayScale_image.jpg",diff_gray)
             # print('Czekam na dowolny klawisz!')
             # cv2.waitKey(0)
-
-
 
             #KALIBRACJA!!!!
             # value = thresold_calibreation(diff_gray)
@@ -387,10 +362,6 @@ while True:
             board.push(engine_move)
             print(board)
             wyswietlanie()
-            
-               
-
-            
 
     if key == ord('q'):
         break
